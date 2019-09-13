@@ -64,9 +64,9 @@ def delete_show(id):
 
 
 # TODO: Implement the rest of the API here!
-
 """
 ~~~~~~~~~~~~ END API ~~~~~~~~~~~~
 """
+# NOTE: Changed port to 8081 due to interference on 8080
 if __name__ == "__main__":
-    app.run(port=8080, debug=True)
+    app.run(port=8081, debug=True)
