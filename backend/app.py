@@ -10,6 +10,9 @@ CODE_CREATED = 201
 CODE_NOT_FOUND = 404
 CODE_BAD_REQUEST = 400
 
+CONTACT_PROPS = {"REQUIRED": ["hobby", "name", "nickname"],
+                 "OPTIONAL": ["id"]}
+
 def create_response(
     data: dict = None, status: int = 200, message: str = ""
 ) -> Tuple[Response, int]:
@@ -54,7 +57,18 @@ def mirror(name):
 
 @app.route("/contacts", methods=['GET'])
 def get_all_contacts():
-    return create_response({"contacts": db.get('contacts')})
+    if len(request.args) == 0:
+        return create_response({"contacts": db.get('contacts')})
+    
+    return get_contacts_by_hobby(request.args.get("hobby"))
+
+def get_contacts_by_hobby(hobby):
+    if not isValid(hobby):
+        return create_response(status=CODE_BAD_REQUEST, message="Hobby not specified in params")
+
+    contacts = db.getByPropValue("contacts", "hobby", hobby)
+    return create_response({"contacts": contacts})
+
 
 @app.route("/contacts/<id>", methods=['GET'])
 def get_contact_by_id(id):
@@ -71,25 +85,23 @@ def get_contact_by_id(id):
 @app.route("/contacts", methods=['POST'])
 def create_contact():
     data = request.form
+    value = None
+    userToAdd = {}
 
-    try:
-        name = data['name']
-        nickname = data['nickname']
-        hobby = data['hobby']
-    except:
-        return create_response(status=CODE_UNPROCESSABLE, message="Fields 'name', 'nickname', and 'hobby' must be in request body.")
+    for prop in CONTACT_PROPS["REQUIRED"]:
+        try:
+            value = data[prop]
+        except:
+            return create_response(status=CODE_UNPROCESSABLE, 
+            message="Field '" + prop +  "' must be in request body.")
 
-    if(not(isValid(name) and isValid(nickname) and isValid(hobby))):
-        return create_response(status=CODE_UNPROCESSABLE, message="Name, nickname and hobby must all be non-null and not empty")
-    
-    user = {
-        "name": name,
-        "nickname": nickname,
-        "hobby": hobby
-    }
+        if not(isValid(value)):
+            return create_response(status=CODE_UNPROCESSABLE, 
+            message= prop + " must be non-null and not empty") 
 
-    db.create("contacts", user) 
+        userToAdd[prop] = value   
 
+    db.create("contacts", userToAdd) 
     return create_response(status=CODE_CREATED, message="User created")
 
 @app.route("/shows/<id>", methods=['DELETE'])

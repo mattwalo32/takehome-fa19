@@ -7,6 +7,15 @@ db_state = initial_db_state
 def get(type):
     return db_state[type]
 
+def getByPropValue(type, prop, value):
+    rows = db_state[type]
+    filteredRows = []
+
+    for row in rows:
+        if(row[prop] == value):
+            filteredRows.append(row)
+
+    return filteredRows
 
 def getById(type, id):
     return next((i for i in get(type) if i["id"] == id), None)
