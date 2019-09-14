@@ -5,6 +5,10 @@ import mockdb.mockdb_interface as db
 
 app = Flask(__name__)
 
+CODE_UNPROCESSABLE = 422
+CODE_CREATED = 201
+CODE_NOT_FOUND = 404
+CODE_BAD_REQUEST = 400
 
 def create_response(
     data: dict = None, status: int = 200, message: str = ""
@@ -39,12 +43,9 @@ def create_response(
 """
 ~~~~~~~~~~~~ API ~~~~~~~~~~~~
 """
-
-
 @app.route("/")
 def hello_world():
     return create_response({"content": "hello world!"})
-
 
 @app.route("/mirror/<name>")
 def mirror(name):
@@ -58,20 +59,49 @@ def get_all_contacts():
 @app.route("/contacts/<id>", methods=['GET'])
 def get_contact_by_id(id):
     if not id.isdigit():
-        return create_response(status=404, message="Invalid id, " + id)
+        return create_response(status=CODE_BAD_REQUEST, message="Invalid id, " + id)
 
     contact = db.getById('contacts', int(id))
+    
     if contact is None:
-        return create_response(status=404, message="No contact with id " + id +  " exists")
+        return create_response(status=CODE_NOT_FOUND, message="No contact with id " + id +  " exists")
+    
     return create_response({"contact": contact})
+
+@app.route("/contacts", methods=['POST'])
+def create_contact():
+    data = request.form
+
+    try:
+        name = data['name']
+        nickname = data['nickname']
+        hobby = data['hobby']
+    except:
+        return create_response(status=CODE_UNPROCESSABLE, message="Fields 'name', 'nickname', and 'hobby' must be in request body.")
+
+    if(not(isValid(name) and isValid(nickname) and isValid(hobby))):
+        return create_response(status=CODE_UNPROCESSABLE, message="Name, nickname and hobby must all be non-null and not empty")
+    
+    user = {
+        "name": name,
+        "nickname": nickname,
+        "hobby": hobby
+    }
+
+    db.create("contacts", user) 
+
+    return create_response(status=CODE_CREATED, message="User created")
 
 @app.route("/shows/<id>", methods=['DELETE'])
 def delete_show(id):
     if db.getById('contacts', int(id)) is None:
-        return create_response(status=404, message="No contact with this id exists")
+        return create_response(status=CODE_NOT_FOUND, message="No contact with this id exists")
     db.deleteById('contacts', int(id))
     return create_response(message="Contact deleted")
 
+
+def isValid(input):
+    return input is not None and input.replace(" ", "") != ""
 
 # TODO: Implement the rest of the API here!
 """
