@@ -20,7 +20,7 @@ class App extends Component {
         <Instructions complete="true" />
 
         {this.state.contacts.map(x => (
-          <Contact id={x.id} name={x.name} nickcname={x.nickname} hobby={x.hobby} />
+          <Contact id={x.id} name={x.name} nickname={x.nickname} hobby={x.hobby} />
         ))}
       </div>
     )

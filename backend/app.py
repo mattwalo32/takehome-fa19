@@ -55,6 +55,16 @@ def mirror(name):
 def get_all_contacts():
     return create_response({"contacts": db.get('contacts')})
 
+@app.route("/contacts/<id>", methods=['GET'])
+def get_contact_by_id(id):
+    if not id.isdigit():
+        return create_response(status=404, message="Invalid id, " + id)
+
+    contact = db.getById('contacts', int(id))
+    if contact is None:
+        return create_response(status=404, message="No contact with id " + id +  " exists")
+    return create_response({"contact": contact})
+
 @app.route("/shows/<id>", methods=['DELETE'])
 def delete_show(id):
     if db.getById('contacts', int(id)) is None:
