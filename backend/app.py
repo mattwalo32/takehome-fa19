@@ -69,7 +69,6 @@ def get_contacts_by_hobby(hobby):
     contacts = db.getByPropValue("contacts", "hobby", hobby)
     return create_response({"contacts": contacts})
 
-
 @app.route("/contacts/<id>", methods=['GET'])
 def get_contact_by_id(id):
     if not id.isdigit():
@@ -103,6 +102,21 @@ def create_contact():
 
     db.create("contacts", userToAdd) 
     return create_response(status=CODE_CREATED, message="User created")
+
+@app.route("/contacts/<id>", methods=['PUT'])
+def modify_contact(id):
+    if db.getById('contacts', int(id)) is None:
+        return create_response(status=CODE_NOT_FOUND, message="No contact with id " + id + " exists")
+    
+    values = request.form
+    updateValues = {}
+    for key, value in values.items():
+        if(key in CONTACT_PROPS["REQUIRED"]):
+            updateValues[key] = value
+    
+    c = db.updateById('contacts', int(id), updateValues)
+
+    return create_response(status=CODE_CREATED, message="Contact updated")
 
 @app.route("/shows/<id>", methods=['DELETE'])
 def delete_show(id):
