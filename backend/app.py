@@ -118,18 +118,16 @@ def modify_contact(id):
 
     return create_response(status=CODE_CREATED, message="Contact updated")
 
-@app.route("/shows/<id>", methods=['DELETE'])
-def delete_show(id):
+@app.route("/contacts/<id>", methods=['DELETE'])
+def delete_contacts(id):
     if db.getById('contacts', int(id)) is None:
-        return create_response(status=CODE_NOT_FOUND, message="No contact with this id exists")
+        return create_response(status=CODE_NOT_FOUND, message="No contact with id " + id + " exists")
     db.deleteById('contacts', int(id))
     return create_response(message="Contact deleted")
 
 
 def isValid(input):
     return input is not None and input.replace(" ", "") != ""
-
-# TODO: Implement the rest of the API here!
 """
 ~~~~~~~~~~~~ END API ~~~~~~~~~~~~
 """
