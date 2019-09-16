@@ -5,6 +5,7 @@ import mockdb.mockdb_interface as db
 
 app = Flask(__name__)
 
+# CONSTANTS
 CODE_UNPROCESSABLE = 422
 CODE_CREATED = 201
 CODE_NOT_FOUND = 404
@@ -62,13 +63,6 @@ def get_all_contacts():
     
     return get_contacts_by_hobby(request.args.get("hobby"))
 
-def get_contacts_by_hobby(hobby):
-    if not isValid(hobby):
-        return create_response(status=CODE_BAD_REQUEST, message="Hobby not specified in params")
-
-    contacts = db.getByPropValue("contacts", "hobby", hobby)
-    return create_response({"contacts": contacts})
-
 @app.route("/contacts/<id>", methods=['GET'])
 def get_contact_by_id(id):
     if not id.isdigit():
@@ -87,6 +81,7 @@ def create_contact():
     value = None
     userToAdd = {}
 
+    # Loop through list of required props to see if they're in header and valid
     for prop in CONTACT_PROPS["REQUIRED"]:
         try:
             value = data[prop]
@@ -125,6 +120,15 @@ def delete_contacts(id):
     db.deleteById('contacts', int(id))
     return create_response(message="Contact deleted")
 
+"""
+~~~~~~~~~~ HELPER FUNCTIONS ~~~~~~~~~~
+"""
+def get_contacts_by_hobby(hobby):
+    if not isValid(hobby):
+        return create_response(status=CODE_BAD_REQUEST, message="Hobby not specified in params")
+
+    contacts = db.getByPropValue("contacts", "hobby", hobby)
+    return create_response({"contacts": contacts})
 
 def isValid(input):
     return input is not None and input.replace(" ", "") != ""

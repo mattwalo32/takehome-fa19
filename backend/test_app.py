@@ -19,7 +19,7 @@ def test_get_contacts(client):
     assert res.status_code == 200
 
     res_users = res.json["result"]["contacts"]
-    assert len(res_users) == 4
+    assert len(res_users) == 3
     assert res_users[0]["name"] == "Angad"
 
 
@@ -29,7 +29,7 @@ def tests_get_contacts_with_hobby(client):
 
     res_users = res.json["result"]["contacts"]
     assert len(res_users) == 1
-    assert res_users[1]["name"] == "Roy"
+    assert res_users[0]["name"] == "Roy"
 
 
 def test_get_contacts_id(client):
