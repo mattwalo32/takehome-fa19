@@ -8,20 +8,8 @@ class App extends Component {
   render() {
     return (
       <div>
-        <h2>{this.props.name}</h2>
-        <ul>
-          <li>
-            {this.props.id}
-          </li>
-
-          <li>
-            {this.props.nickname}
-          </li>
-
-          <li>
-            {this.props.hobby}
-          </li>
-        </ul>
+        <h>{this.props.name}</h>
+        <br />
       </div>
     )
   }
